@@ -25,3 +25,10 @@ closure-release-*
 builds
 .cljs*
 node_modules
+/checkouts
+pom.xml
+*.jar
+*.class
+.lein-deps-sum
+.lein-failures
+.lein-plugins

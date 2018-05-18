@@ -1,0 +1,41 @@
+.mediumGrey{
+    background-color:#636363
+}
+
+.darkGrey{
+    background-color: #212121;
+}
+
+.retroGreen{
+    background-color: #ABFF4F;
+}
+
+.lightGrey{
+    background-color: #ededed;
+}
+
+.beerfastYellow{
+    background-color: #ffb200;
+}
+
+/* text */
+
+.mediumGreyText{
+    color:#636363
+}
+
+.darkGreyText{
+    color: #212121;
+}
+
+.retroGreenText{
+    color: #ABFF4F;
+}
+
+.lightGreyText{
+    color: #ededed;
+}
+
+.beerfastYellowText{
+    color: #ffb200;
+}
