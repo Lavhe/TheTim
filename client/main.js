@@ -708,6 +708,248 @@ goog.string.toSelectorCaseCache_ = {};
 goog.string.toSelectorCase = function(a) {
   return goog.string.toSelectorCaseCache_[a] || (goog.string.toSelectorCaseCache_[a] = ("" + a).replace(/([A-Z])/g, "-$1").toLowerCase())
 };
+goog.userAgent = {};
+goog.userAgent.jscript = {};
+goog.userAgent.jscript.ASSUME_NO_JSCRIPT = !1;
+goog.userAgent.jscript.init_ = function() {
+  goog.userAgent.jscript.DETECTED_HAS_JSCRIPT_ = "ScriptEngine" in goog.global && "JScript" == goog.global.ScriptEngine();
+  goog.userAgent.jscript.DETECTED_VERSION_ = goog.userAgent.jscript.DETECTED_HAS_JSCRIPT_ ? goog.global.ScriptEngineMajorVersion() + "." + goog.global.ScriptEngineMinorVersion() + "." + goog.global.ScriptEngineBuildVersion() : "0"
+};
+goog.userAgent.jscript.ASSUME_NO_JSCRIPT || goog.userAgent.jscript.init_();
+goog.userAgent.jscript.HAS_JSCRIPT = goog.userAgent.jscript.ASSUME_NO_JSCRIPT ? !1 : goog.userAgent.jscript.DETECTED_HAS_JSCRIPT_;
+goog.userAgent.jscript.VERSION = goog.userAgent.jscript.ASSUME_NO_JSCRIPT ? "0" : goog.userAgent.jscript.DETECTED_VERSION_;
+goog.userAgent.jscript.isVersion = function(a) {
+  return 0 <= goog.string.compareVersions(goog.userAgent.jscript.VERSION, a)
+};
+goog.string.StringBuffer = function(a, b) {
+  this.buffer_ = goog.userAgent.jscript.HAS_JSCRIPT ? [] : "";
+  null != a && this.append.apply(this, arguments)
+};
+goog.string.StringBuffer.prototype.set = function(a) {
+  this.clear();
+  this.append(a)
+};
+goog.userAgent.jscript.HAS_JSCRIPT ? (goog.string.StringBuffer.prototype.bufferLength_ = 0, goog.string.StringBuffer.prototype.append = function(a, b, c) {
+  null == b ? this.buffer_[this.bufferLength_++] = a : (this.buffer_.push.apply(this.buffer_, arguments), this.bufferLength_ = this.buffer_.length);
+  return this
+}) : goog.string.StringBuffer.prototype.append = function(a, b, c) {
+  this.buffer_ += a;
+  if(null != b) {
+    for(var d = 1;d < arguments.length;d++) {
+      this.buffer_ += arguments[d]
+    }
+  }
+  return this
+};
+goog.string.StringBuffer.prototype.clear = function() {
+  if(goog.userAgent.jscript.HAS_JSCRIPT) {
+    this.bufferLength_ = this.buffer_.length = 0
+  }else {
+    this.buffer_ = ""
+  }
+};
+goog.string.StringBuffer.prototype.getLength = function() {
+  return this.toString().length
+};
+goog.string.StringBuffer.prototype.toString = function() {
+  if(goog.userAgent.jscript.HAS_JSCRIPT) {
+    var a = this.buffer_.join("");
+    this.clear();
+    a && this.append(a);
+    return a
+  }
+  return this.buffer_
+};
+goog.object = {};
+goog.object.forEach = function(a, b, c) {
+  for(var d in a) {
+    b.call(c, a[d], d, a)
+  }
+};
+goog.object.filter = function(a, b, c) {
+  var d = {}, e;
+  for(e in a) {
+    b.call(c, a[e], e, a) && (d[e] = a[e])
+  }
+  return d
+};
+goog.object.map = function(a, b, c) {
+  var d = {}, e;
+  for(e in a) {
+    d[e] = b.call(c, a[e], e, a)
+  }
+  return d
+};
+goog.object.some = function(a, b, c) {
+  for(var d in a) {
+    if(b.call(c, a[d], d, a)) {
+      return!0
+    }
+  }
+  return!1
+};
+goog.object.every = function(a, b, c) {
+  for(var d in a) {
+    if(!b.call(c, a[d], d, a)) {
+      return!1
+    }
+  }
+  return!0
+};
+goog.object.getCount = function(a) {
+  var b = 0, c;
+  for(c in a) {
+    b++
+  }
+  return b
+};
+goog.object.getAnyKey = function(a) {
+  for(var b in a) {
+    return b
+  }
+};
+goog.object.getAnyValue = function(a) {
+  for(var b in a) {
+    return a[b]
+  }
+};
+goog.object.contains = function(a, b) {
+  return goog.object.containsValue(a, b)
+};
+goog.object.getValues = function(a) {
+  var b = [], c = 0, d;
+  for(d in a) {
+    b[c++] = a[d]
+  }
+  return b
+};
+goog.object.getKeys = function(a) {
+  var b = [], c = 0, d;
+  for(d in a) {
+    b[c++] = d
+  }
+  return b
+};
+goog.object.getValueByKeys = function(a, b) {
+  for(var c = goog.isArrayLike(b), d = c ? b : arguments, c = c ? 0 : 1;c < d.length && !(a = a[d[c]], !goog.isDef(a));c++) {
+  }
+  return a
+};
+goog.object.containsKey = function(a, b) {
+  return b in a
+};
+goog.object.containsValue = function(a, b) {
+  for(var c in a) {
+    if(a[c] == b) {
+      return!0
+    }
+  }
+  return!1
+};
+goog.object.findKey = function(a, b, c) {
+  for(var d in a) {
+    if(b.call(c, a[d], d, a)) {
+      return d
+    }
+  }
+};
+goog.object.findValue = function(a, b, c) {
+  return(b = goog.object.findKey(a, b, c)) && a[b]
+};
+goog.object.isEmpty = function(a) {
+  for(var b in a) {
+    return!1
+  }
+  return!0
+};
+goog.object.clear = function(a) {
+  for(var b in a) {
+    delete a[b]
+  }
+};
+goog.object.remove = function(a, b) {
+  var c;
+  (c = b in a) && delete a[b];
+  return c
+};
+goog.object.add = function(a, b, c) {
+  if(b in a) {
+    throw Error('The object already contains the key "' + b + '"');
+  }
+  goog.object.set(a, b, c)
+};
+goog.object.get = function(a, b, c) {
+  return b in a ? a[b] : c
+};
+goog.object.set = function(a, b, c) {
+  a[b] = c
+};
+goog.object.setIfUndefined = function(a, b, c) {
+  return b in a ? a[b] : a[b] = c
+};
+goog.object.clone = function(a) {
+  var b = {}, c;
+  for(c in a) {
+    b[c] = a[c]
+  }
+  return b
+};
+goog.object.unsafeClone = function(a) {
+  var b = goog.typeOf(a);
+  if("object" == b || "array" == b) {
+    if(a.clone) {
+      return a.clone()
+    }
+    var b = "array" == b ? [] : {}, c;
+    for(c in a) {
+      b[c] = goog.object.unsafeClone(a[c])
+    }
+    return b
+  }
+  return a
+};
+goog.object.transpose = function(a) {
+  var b = {}, c;
+  for(c in a) {
+    b[a[c]] = c
+  }
+  return b
+};
+goog.object.PROTOTYPE_FIELDS_ = "constructor hasOwnProperty isPrototypeOf propertyIsEnumerable toLocaleString toString valueOf".split(" ");
+goog.object.extend = function(a, b) {
+  for(var c, d, e = 1;e < arguments.length;e++) {
+    d = arguments[e];
+    for(c in d) {
+      a[c] = d[c]
+    }
+    for(var f = 0;f < goog.object.PROTOTYPE_FIELDS_.length;f++) {
+      c = goog.object.PROTOTYPE_FIELDS_[f], Object.prototype.hasOwnProperty.call(d, c) && (a[c] = d[c])
+    }
+  }
+};
+goog.object.create = function(a) {
+  var b = arguments.length;
+  if(1 == b && goog.isArray(arguments[0])) {
+    return goog.object.create.apply(null, arguments[0])
+  }
+  if(b % 2) {
+    throw Error("Uneven number of arguments");
+  }
+  for(var c = {}, d = 0;d < b;d += 2) {
+    c[arguments[d]] = arguments[d + 1]
+  }
+  return c
+};
+goog.object.createSet = function(a) {
+  var b = arguments.length;
+  if(1 == b && goog.isArray(arguments[0])) {
+    return goog.object.createSet.apply(null, arguments[0])
+  }
+  for(var c = {}, d = 0;d < b;d++) {
+    c[arguments[d]] = !0
+  }
+  return c
+};
 goog.debug = {};
 goog.debug.Error = function(a) {
   this.stack = Error().stack || "";
@@ -1121,248 +1363,6 @@ goog.array.shuffle = function(a, b) {
     a[d] = a[e];
     a[e] = f
   }
-};
-goog.object = {};
-goog.object.forEach = function(a, b, c) {
-  for(var d in a) {
-    b.call(c, a[d], d, a)
-  }
-};
-goog.object.filter = function(a, b, c) {
-  var d = {}, e;
-  for(e in a) {
-    b.call(c, a[e], e, a) && (d[e] = a[e])
-  }
-  return d
-};
-goog.object.map = function(a, b, c) {
-  var d = {}, e;
-  for(e in a) {
-    d[e] = b.call(c, a[e], e, a)
-  }
-  return d
-};
-goog.object.some = function(a, b, c) {
-  for(var d in a) {
-    if(b.call(c, a[d], d, a)) {
-      return!0
-    }
-  }
-  return!1
-};
-goog.object.every = function(a, b, c) {
-  for(var d in a) {
-    if(!b.call(c, a[d], d, a)) {
-      return!1
-    }
-  }
-  return!0
-};
-goog.object.getCount = function(a) {
-  var b = 0, c;
-  for(c in a) {
-    b++
-  }
-  return b
-};
-goog.object.getAnyKey = function(a) {
-  for(var b in a) {
-    return b
-  }
-};
-goog.object.getAnyValue = function(a) {
-  for(var b in a) {
-    return a[b]
-  }
-};
-goog.object.contains = function(a, b) {
-  return goog.object.containsValue(a, b)
-};
-goog.object.getValues = function(a) {
-  var b = [], c = 0, d;
-  for(d in a) {
-    b[c++] = a[d]
-  }
-  return b
-};
-goog.object.getKeys = function(a) {
-  var b = [], c = 0, d;
-  for(d in a) {
-    b[c++] = d
-  }
-  return b
-};
-goog.object.getValueByKeys = function(a, b) {
-  for(var c = goog.isArrayLike(b), d = c ? b : arguments, c = c ? 0 : 1;c < d.length && !(a = a[d[c]], !goog.isDef(a));c++) {
-  }
-  return a
-};
-goog.object.containsKey = function(a, b) {
-  return b in a
-};
-goog.object.containsValue = function(a, b) {
-  for(var c in a) {
-    if(a[c] == b) {
-      return!0
-    }
-  }
-  return!1
-};
-goog.object.findKey = function(a, b, c) {
-  for(var d in a) {
-    if(b.call(c, a[d], d, a)) {
-      return d
-    }
-  }
-};
-goog.object.findValue = function(a, b, c) {
-  return(b = goog.object.findKey(a, b, c)) && a[b]
-};
-goog.object.isEmpty = function(a) {
-  for(var b in a) {
-    return!1
-  }
-  return!0
-};
-goog.object.clear = function(a) {
-  for(var b in a) {
-    delete a[b]
-  }
-};
-goog.object.remove = function(a, b) {
-  var c;
-  (c = b in a) && delete a[b];
-  return c
-};
-goog.object.add = function(a, b, c) {
-  if(b in a) {
-    throw Error('The object already contains the key "' + b + '"');
-  }
-  goog.object.set(a, b, c)
-};
-goog.object.get = function(a, b, c) {
-  return b in a ? a[b] : c
-};
-goog.object.set = function(a, b, c) {
-  a[b] = c
-};
-goog.object.setIfUndefined = function(a, b, c) {
-  return b in a ? a[b] : a[b] = c
-};
-goog.object.clone = function(a) {
-  var b = {}, c;
-  for(c in a) {
-    b[c] = a[c]
-  }
-  return b
-};
-goog.object.unsafeClone = function(a) {
-  var b = goog.typeOf(a);
-  if("object" == b || "array" == b) {
-    if(a.clone) {
-      return a.clone()
-    }
-    var b = "array" == b ? [] : {}, c;
-    for(c in a) {
-      b[c] = goog.object.unsafeClone(a[c])
-    }
-    return b
-  }
-  return a
-};
-goog.object.transpose = function(a) {
-  var b = {}, c;
-  for(c in a) {
-    b[a[c]] = c
-  }
-  return b
-};
-goog.object.PROTOTYPE_FIELDS_ = "constructor hasOwnProperty isPrototypeOf propertyIsEnumerable toLocaleString toString valueOf".split(" ");
-goog.object.extend = function(a, b) {
-  for(var c, d, e = 1;e < arguments.length;e++) {
-    d = arguments[e];
-    for(c in d) {
-      a[c] = d[c]
-    }
-    for(var f = 0;f < goog.object.PROTOTYPE_FIELDS_.length;f++) {
-      c = goog.object.PROTOTYPE_FIELDS_[f], Object.prototype.hasOwnProperty.call(d, c) && (a[c] = d[c])
-    }
-  }
-};
-goog.object.create = function(a) {
-  var b = arguments.length;
-  if(1 == b && goog.isArray(arguments[0])) {
-    return goog.object.create.apply(null, arguments[0])
-  }
-  if(b % 2) {
-    throw Error("Uneven number of arguments");
-  }
-  for(var c = {}, d = 0;d < b;d += 2) {
-    c[arguments[d]] = arguments[d + 1]
-  }
-  return c
-};
-goog.object.createSet = function(a) {
-  var b = arguments.length;
-  if(1 == b && goog.isArray(arguments[0])) {
-    return goog.object.createSet.apply(null, arguments[0])
-  }
-  for(var c = {}, d = 0;d < b;d++) {
-    c[arguments[d]] = !0
-  }
-  return c
-};
-goog.userAgent = {};
-goog.userAgent.jscript = {};
-goog.userAgent.jscript.ASSUME_NO_JSCRIPT = !1;
-goog.userAgent.jscript.init_ = function() {
-  goog.userAgent.jscript.DETECTED_HAS_JSCRIPT_ = "ScriptEngine" in goog.global && "JScript" == goog.global.ScriptEngine();
-  goog.userAgent.jscript.DETECTED_VERSION_ = goog.userAgent.jscript.DETECTED_HAS_JSCRIPT_ ? goog.global.ScriptEngineMajorVersion() + "." + goog.global.ScriptEngineMinorVersion() + "." + goog.global.ScriptEngineBuildVersion() : "0"
-};
-goog.userAgent.jscript.ASSUME_NO_JSCRIPT || goog.userAgent.jscript.init_();
-goog.userAgent.jscript.HAS_JSCRIPT = goog.userAgent.jscript.ASSUME_NO_JSCRIPT ? !1 : goog.userAgent.jscript.DETECTED_HAS_JSCRIPT_;
-goog.userAgent.jscript.VERSION = goog.userAgent.jscript.ASSUME_NO_JSCRIPT ? "0" : goog.userAgent.jscript.DETECTED_VERSION_;
-goog.userAgent.jscript.isVersion = function(a) {
-  return 0 <= goog.string.compareVersions(goog.userAgent.jscript.VERSION, a)
-};
-goog.string.StringBuffer = function(a, b) {
-  this.buffer_ = goog.userAgent.jscript.HAS_JSCRIPT ? [] : "";
-  null != a && this.append.apply(this, arguments)
-};
-goog.string.StringBuffer.prototype.set = function(a) {
-  this.clear();
-  this.append(a)
-};
-goog.userAgent.jscript.HAS_JSCRIPT ? (goog.string.StringBuffer.prototype.bufferLength_ = 0, goog.string.StringBuffer.prototype.append = function(a, b, c) {
-  null == b ? this.buffer_[this.bufferLength_++] = a : (this.buffer_.push.apply(this.buffer_, arguments), this.bufferLength_ = this.buffer_.length);
-  return this
-}) : goog.string.StringBuffer.prototype.append = function(a, b, c) {
-  this.buffer_ += a;
-  if(null != b) {
-    for(var d = 1;d < arguments.length;d++) {
-      this.buffer_ += arguments[d]
-    }
-  }
-  return this
-};
-goog.string.StringBuffer.prototype.clear = function() {
-  if(goog.userAgent.jscript.HAS_JSCRIPT) {
-    this.bufferLength_ = this.buffer_.length = 0
-  }else {
-    this.buffer_ = ""
-  }
-};
-goog.string.StringBuffer.prototype.getLength = function() {
-  return this.toString().length
-};
-goog.string.StringBuffer.prototype.toString = function() {
-  if(goog.userAgent.jscript.HAS_JSCRIPT) {
-    var a = this.buffer_.join("");
-    this.clear();
-    a && this.append(a);
-    return a
-  }
-  return this.buffer_
 };
 var cljs = {core:{}};
 cljs.core._STAR_unchecked_if_STAR_ = !1;
@@ -12131,96 +12131,32 @@ cljs.core.get_method = function(a, b) {
 cljs.core.prefers = function(a) {
   return cljs.core._prefers.call(null, a)
 };
-cljs.reader = {};
-void 0;
-cljs.reader.PushbackReader = {};
-cljs.reader.read_char = function(a) {
-  if(a ? a.cljs$reader$PushbackReader$read_char$arity$1 : a) {
-    a = a.cljs$reader$PushbackReader$read_char$arity$1(a)
-  }else {
-    var b;
-    b = cljs.reader.read_char[goog.typeOf.call(null, a)];
-    if(!b && (b = cljs.reader.read_char._, !b)) {
-      throw cljs.core.missing_protocol.call(null, "PushbackReader.read-char", a);
+var jayq = {util:{}};
+jayq.util.map__GT_js = function(a) {
+  var b = {}, a = cljs.core.seq.call(null, a);
+  if(cljs.core.truth_(a)) {
+    var c = cljs.core.first.call(null, a);
+    cljs.core.nth.call(null, c, 0, null);
+    for(cljs.core.nth.call(null, c, 1, null);;) {
+      var d = c, c = cljs.core.nth.call(null, d, 0, null), d = cljs.core.nth.call(null, d, 1, null);
+      b[cljs.core.name.call(null, c)] = d;
+      a = cljs.core.next.call(null, a);
+      if(cljs.core.truth_(a)) {
+        c = a, a = cljs.core.first.call(null, c), d = c, c = a, a = d
+      }else {
+        break
+      }
     }
-    a = b.call(null, a)
   }
-  return a
+  return b
 };
-cljs.reader.unread = function(a, b) {
-  var c;
-  if(a ? a.cljs$reader$PushbackReader$unread$arity$2 : a) {
-    c = a.cljs$reader$PushbackReader$unread$arity$2(a, b)
-  }else {
-    c = cljs.reader.unread[goog.typeOf.call(null, a)];
-    if(!c && (c = cljs.reader.unread._, !c)) {
-      throw cljs.core.missing_protocol.call(null, "PushbackReader.unread", a);
-    }
-    c = c.call(null, a, b)
-  }
-  return c
+jayq.util.wait = function(a, b) {
+  return setTimeout(b, a)
 };
-void 0;
-cljs.reader.StringPushbackReader = function(a, b, c) {
-  this.s = a;
-  this.index_atom = b;
-  this.buffer_atom = c
-};
-cljs.reader.StringPushbackReader.cljs$lang$type = !0;
-cljs.reader.StringPushbackReader.cljs$lang$ctorPrSeq = function() {
-  return cljs.core.list.call(null, "cljs.reader.StringPushbackReader")
-};
-cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$ = !0;
-cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$read_char$arity$1 = function() {
-  if(cljs.core.empty_QMARK_.call(null, cljs.core.deref.call(null, this.buffer_atom))) {
-    var a = cljs.core.deref.call(null, this.index_atom);
-    cljs.core.swap_BANG_.call(null, this.index_atom, cljs.core.inc);
-    return this.s[a]
-  }
-  a = cljs.core.deref.call(null, this.buffer_atom);
-  cljs.core.swap_BANG_.call(null, this.buffer_atom, cljs.core.rest);
-  return cljs.core.first.call(null, a)
-};
-cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$unread$arity$2 = function(a, b) {
-  return cljs.core.swap_BANG_.call(null, this.buffer_atom, function(a) {
-    return cljs.core.cons.call(null, b, a)
-  })
-};
-cljs.reader.StringPushbackReader;
-cljs.reader.push_back_reader = function(a) {
-  return new cljs.reader.StringPushbackReader(a, cljs.core.atom.call(null, 0), cljs.core.atom.call(null, null))
-};
-cljs.reader.whitespace_QMARK_ = function(a) {
-  var b = goog.string.isBreakingWhitespace.call(null, a);
-  return cljs.core.truth_(b) ? b : "," === a
-};
-cljs.reader.numeric_QMARK_ = function(a) {
-  return goog.string.isNumeric.call(null, a)
-};
-cljs.reader.comment_prefix_QMARK_ = function(a) {
-  return";" === a
-};
-cljs.reader.number_literal_QMARK_ = function(a, b) {
-  var c = cljs.reader.numeric_QMARK_.call(null, b);
-  if(c) {
-    return c
-  }
-  c = function() {
-    var a = "+" === b;
-    return a ? a : "-" === b
-  }();
-  return cljs.core.truth_(c) ? cljs.reader.numeric_QMARK_.call(null, function() {
-    var b = cljs.reader.read_char.call(null, a);
-    cljs.reader.unread.call(null, a, b);
-    return b
-  }()) : c
-};
-void 0;
-void 0;
-void 0;
-cljs.reader.reader_error = function() {
+jayq.util.log = function() {
   var a = function(a, b) {
-    throw cljs.core.apply.call(null, cljs.core.str, b);
+    var e = cljs.core.string_QMARK_.call(null, a) ? cljs.core.apply.call(null, cljs.core.str, a, b) : a;
+    return console.log(e)
   }, b = function(b, d) {
     var e = null;
     goog.isDef(d) && (e = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1), 0));
@@ -12234,246 +12170,11 @@ cljs.reader.reader_error = function() {
   b.cljs$lang$arity$variadic = a;
   return b
 }();
-cljs.reader.macro_terminating_QMARK_ = function(a) {
-  var b = "#" != a;
-  return b && (b = "'" != a) ? (b = ":" != a) ? cljs.reader.macros.call(null, a) : b : b
-};
-cljs.reader.read_token = function(a, b) {
-  for(var c = new goog.string.StringBuffer(b), d = cljs.reader.read_char.call(null, a);;) {
-    var e;
-    e = null == d;
-    e || (e = (e = cljs.reader.whitespace_QMARK_.call(null, d)) ? e : cljs.reader.macro_terminating_QMARK_.call(null, d));
-    if(e) {
-      return cljs.reader.unread.call(null, a, d), c.toString()
-    }
-    c.append(d);
-    d = cljs.reader.read_char.call(null, a)
-  }
-};
-cljs.reader.skip_line = function(a) {
-  for(;;) {
-    var b = cljs.reader.read_char.call(null, a);
-    var c = "n" === b;
-    b = c ? c : (c = "r" === b) ? c : null == b;
-    if(b) {
-      return a
-    }
-  }
-};
-cljs.reader.int_pattern = cljs.core.re_pattern.call(null, "([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?");
-cljs.reader.ratio_pattern = cljs.core.re_pattern.call(null, "([-+]?[0-9]+)/([0-9]+)");
-cljs.reader.float_pattern = cljs.core.re_pattern.call(null, "([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?");
-cljs.reader.symbol_pattern = cljs.core.re_pattern.call(null, "[:]?([^0-9/].*/)?([^0-9/][^/]*)");
-cljs.reader.re_find_STAR_ = function(a, b) {
-  var c = a.exec(b);
-  return null != c ? 1 === c.length ? c[0] : c : null
-};
-cljs.reader.match_int = function(a) {
-  var a = cljs.reader.re_find_STAR_.call(null, cljs.reader.int_pattern, a), b = a[2];
-  var c = null == b, b = c ? c : 1 > b.length;
-  if(!b) {
-    return 0
-  }
-  b = "-" === a[1] ? -1 : 1;
-  c = cljs.core.truth_(a[3]) ? [a[3], 10] : cljs.core.truth_(a[4]) ? [a[4], 16] : cljs.core.truth_(a[5]) ? [a[5], 8] : cljs.core.truth_(a[7]) ? [a[7], parseInt(a[7])] : [null, null];
-  a = c[0];
-  c = c[1];
-  return null == a ? null : b * parseInt(a, c)
-};
-cljs.reader.match_ratio = function(a) {
-  var a = cljs.reader.re_find_STAR_.call(null, cljs.reader.ratio_pattern, a), b = a[2];
-  return parseInt(a[1]) / parseInt(b)
-};
-cljs.reader.match_float = function(a) {
-  return parseFloat(a)
-};
-cljs.reader.re_matches_STAR_ = function(a, b) {
-  var c = a.exec(b), d;
-  d = (d = null != c) ? c[0] === b : d;
-  return d ? 1 === c.length ? c[0] : c : null
-};
-cljs.reader.match_number = function(a) {
-  return cljs.core.truth_(cljs.reader.re_matches_STAR_.call(null, cljs.reader.int_pattern, a)) ? cljs.reader.match_int.call(null, a) : cljs.core.truth_(cljs.reader.re_matches_STAR_.call(null, cljs.reader.ratio_pattern, a)) ? cljs.reader.match_ratio.call(null, a) : cljs.core.truth_(cljs.reader.re_matches_STAR_.call(null, cljs.reader.float_pattern, a)) ? cljs.reader.match_float.call(null, a) : null
-};
-cljs.reader.escape_char_map = function(a) {
-  return"f" === a ? "\u000c" : "b" === a ? "\u0008" : '"' === a ? '"' : "\\" === a ? "\\" : "n" === a ? "\n" : "r" === a ? "\r" : "t" === a ? "\t" : null
-};
-cljs.reader.read_unicode_char = function(a) {
-  return cljs.reader.reader_error.call(null, a, "Unicode characters not supported by reader (yet)")
-};
-cljs.reader.escape_char = function(a, b) {
-  var c = cljs.reader.read_char.call(null, b), d = cljs.reader.escape_char_map.call(null, c);
-  if(cljs.core.truth_(d)) {
-    return d
-  }
-  d = (d = "u" === c) ? d : cljs.reader.numeric_QMARK_.call(null, c);
-  return d ? cljs.reader.read_unicode_char.call(null, b, c) : cljs.reader.reader_error.call(null, b, "Unsupported escape character: \\", c)
-};
-cljs.reader.read_past = function(a, b) {
-  for(var c = cljs.reader.read_char.call(null, b);;) {
-    if(cljs.core.truth_(a.call(null, c))) {
-      c = cljs.reader.read_char.call(null, b)
-    }else {
-      return c
-    }
-  }
-};
-cljs.reader.read_delimited_list = function(a, b, c) {
-  for(var d = cljs.core.transient$.call(null, cljs.core.PersistentVector.fromArray([]));;) {
-    var e = cljs.reader.read_past.call(null, cljs.reader.whitespace_QMARK_, b);
-    cljs.core.truth_(e) || cljs.reader.reader_error.call(null, b, "EOF");
-    if(a === e) {
-      return cljs.core.persistent_BANG_.call(null, d)
-    }
-    var f = cljs.reader.macros.call(null, e);
-    cljs.core.truth_(f) ? e = f.call(null, b, e) : (cljs.reader.unread.call(null, b, e), e = cljs.reader.read.call(null, b, !0, null, c));
-    d = e === b ? d : cljs.core.conj_BANG_.call(null, d, e)
-  }
-};
-cljs.reader.not_implemented = function(a, b) {
-  return cljs.reader.reader_error.call(null, a, "Reader for ", b, " not implemented yet")
-};
-void 0;
-cljs.reader.read_dispatch = function(a, b) {
-  var c = cljs.reader.read_char.call(null, a), d = cljs.reader.dispatch_macros.call(null, c);
-  if(cljs.core.truth_(d)) {
-    return d.call(null, a, b)
-  }
-  d = cljs.reader.maybe_read_tagged_type.call(null, a, c);
-  return cljs.core.truth_(d) ? d : cljs.reader.reader_error.call(null, a, "No dispatch macro for ", c)
-};
-cljs.reader.read_unmatched_delimiter = function(a, b) {
-  return cljs.reader.reader_error.call(null, a, "Unmached delimiter ", b)
-};
-cljs.reader.read_list = function(a) {
-  return cljs.core.apply.call(null, cljs.core.list, cljs.reader.read_delimited_list.call(null, ")", a, !0))
-};
-cljs.reader.read_comment = cljs.reader.skip_line;
-cljs.reader.read_vector = function(a) {
-  return cljs.reader.read_delimited_list.call(null, "]", a, !0)
-};
-cljs.reader.read_map = function(a) {
-  var b = cljs.reader.read_delimited_list.call(null, "}", a, !0);
-  cljs.core.odd_QMARK_.call(null, cljs.core.count.call(null, b)) && cljs.reader.reader_error.call(null, a, "Map literal must contain an even number of forms");
-  return cljs.core.apply.call(null, cljs.core.hash_map, b)
-};
-cljs.reader.read_number = function(a, b) {
-  for(var c = new goog.string.StringBuffer(b), d = cljs.reader.read_char.call(null, a);;) {
-    if(cljs.core.truth_(function() {
-      var a = null == d;
-      return a ? a : (a = cljs.reader.whitespace_QMARK_.call(null, d)) ? a : cljs.reader.macros.call(null, d)
-    }())) {
-      cljs.reader.unread.call(null, a, d);
-      var e = c.toString(), c = cljs.reader.match_number.call(null, e);
-      return cljs.core.truth_(c) ? c : cljs.reader.reader_error.call(null, a, "Invalid number format [", e, "]")
-    }
-    c.append(d);
-    d = e = cljs.reader.read_char.call(null, a)
-  }
-};
-cljs.reader.read_string_STAR_ = function(a) {
-  for(var b = new goog.string.StringBuffer, c = cljs.reader.read_char.call(null, a);;) {
-    if(null == c) {
-      return cljs.reader.reader_error.call(null, a, "EOF while reading string")
-    }
-    if("\\" === c) {
-      b.append(cljs.reader.escape_char.call(null, b, a))
-    }else {
-      if('"' === c) {
-        return b.toString()
-      }
-      b.append(c)
-    }
-    c = cljs.reader.read_char.call(null, a)
-  }
-};
-cljs.reader.special_symbols = cljs.core.ObjMap.fromObject(["nil", "true", "false"], {nil:null, "true":!0, "false":!1});
-cljs.reader.read_symbol = function(a, b) {
-  var c = cljs.reader.read_token.call(null, a, b);
-  return cljs.core.truth_(goog.string.contains.call(null, c, "/")) ? cljs.core.symbol.call(null, cljs.core.subs.call(null, c, 0, c.indexOf("/")), cljs.core.subs.call(null, c, c.indexOf("/") + 1, c.length)) : cljs.core.get.call(null, cljs.reader.special_symbols, c, cljs.core.symbol.call(null, c))
-};
-cljs.reader.read_keyword = function(a) {
-  var b = cljs.reader.read_token.call(null, a, cljs.reader.read_char.call(null, a)), b = cljs.reader.re_matches_STAR_.call(null, cljs.reader.symbol_pattern, b), c = b[0], d = b[1], e = b[2];
-  return cljs.core.truth_(function() {
-    var a;
-    a = (a = void 0 !== d) ? ":/" === d.substring(d.length - 2, d.length) : a;
-    return cljs.core.truth_(a) ? a : (a = ":" === e[e.length - 1]) ? a : -1 !== c.indexOf("::", 1)
-  }()) ? cljs.reader.reader_error.call(null, a, "Invalid token: ", c) : cljs.core.truth_(d) ? cljs.core.keyword.call(null, d.substring(0, d.indexOf("/")), e) : cljs.core.keyword.call(null, c)
-};
-cljs.reader.desugar_meta = function(a) {
-  return cljs.core.symbol_QMARK_.call(null, a) ? cljs.core.ObjMap.fromObject(["\ufdd0'tag"], {"\ufdd0'tag":a}) : cljs.core.string_QMARK_.call(null, a) ? cljs.core.ObjMap.fromObject(["\ufdd0'tag"], {"\ufdd0'tag":a}) : cljs.core.keyword_QMARK_.call(null, a) ? cljs.core.PersistentArrayMap.fromArrays([a], [!0]) : a
-};
-cljs.reader.wrapping_reader = function(a) {
-  return function(b) {
-    return cljs.core.list.call(null, a, cljs.reader.read.call(null, b, !0, null, !0))
-  }
-};
-cljs.reader.throwing_reader = function(a) {
-  return function(b) {
-    return cljs.reader.reader_error.call(null, b, a)
-  }
-};
-cljs.reader.read_meta = function(a) {
-  var b = cljs.reader.desugar_meta.call(null, cljs.reader.read.call(null, a, !0, null, !0));
-  cljs.core.map_QMARK_.call(null, b) || cljs.reader.reader_error.call(null, a, "Metadata must be Symbol,Keyword,String or Map");
-  var c = cljs.reader.read.call(null, a, !0, null, !0), d;
-  null != c ? (d = (d = c.cljs$lang$protocol_mask$partition0$ & 131072) ? d : c.cljs$core$IWithMeta$, d = d ? !0 : c.cljs$lang$protocol_mask$partition0$ ? !1 : cljs.core.type_satisfies_.call(null, cljs.core.IWithMeta, c)) : d = cljs.core.type_satisfies_.call(null, cljs.core.IWithMeta, c);
-  return d ? cljs.core.with_meta.call(null, c, cljs.core.merge.call(null, cljs.core.meta.call(null, c), b)) : cljs.reader.reader_error.call(null, a, "Metadata can only be applied to IWithMetas")
-};
-cljs.reader.read_set = function(a) {
-  return cljs.core.set.call(null, cljs.reader.read_delimited_list.call(null, "}", a, !0))
-};
-cljs.reader.read_regex = function(a, b) {
-  return cljs.core.re_pattern.call(null, cljs.reader.read_string_STAR_.call(null, a, b))
-};
-cljs.reader.read_discard = function(a) {
-  cljs.reader.read.call(null, a, !0, null, !0);
-  return a
-};
-cljs.reader.macros = function(a) {
-  return"@" === a ? cljs.reader.wrapping_reader.call(null, "\ufdd1'deref") : "`" === a ? cljs.reader.not_implemented : '"' === a ? cljs.reader.read_string_STAR_ : "#" === a ? cljs.reader.read_dispatch : "%" === a ? cljs.reader.not_implemented : "'" === a ? cljs.reader.wrapping_reader.call(null, "\ufdd1'quote") : "(" === a ? cljs.reader.read_list : ")" === a ? cljs.reader.read_unmatched_delimiter : ":" === a ? cljs.reader.read_keyword : ";" === a ? cljs.reader.not_implemented : "[" === a ? cljs.reader.read_vector : 
-  "{" === a ? cljs.reader.read_map : "\\" === a ? cljs.reader.read_char : "]" === a ? cljs.reader.read_unmatched_delimiter : "}" === a ? cljs.reader.read_unmatched_delimiter : "^" === a ? cljs.reader.read_meta : "~" === a ? cljs.reader.not_implemented : null
-};
-cljs.reader.dispatch_macros = function(a) {
-  return"_" === a ? cljs.reader.read_discard : "!" === a ? cljs.reader.read_comment : '"' === a ? cljs.reader.read_regex : "<" === a ? cljs.reader.throwing_reader.call(null, "Unreadable form") : "{" === a ? cljs.reader.read_set : null
-};
-cljs.reader.read = function(a, b, c) {
-  for(;;) {
-    var d = cljs.reader.read_char.call(null, a);
-    if(null == d) {
-      return cljs.core.truth_(b) ? cljs.reader.reader_error.call(null, a, "EOF") : c
-    }
-    if(!cljs.reader.whitespace_QMARK_.call(null, d)) {
-      if(cljs.reader.comment_prefix_QMARK_.call(null, d)) {
-        a = cljs.reader.read_comment.call(null, a, d)
-      }else {
-        var e = cljs.reader.macros.call(null, d), d = cljs.core.truth_(e) ? e.call(null, a, d) : cljs.reader.number_literal_QMARK_.call(null, a, d) ? cljs.reader.read_number.call(null, a, d) : cljs.reader.read_symbol.call(null, a, d);
-        if(d !== a) {
-          return d
-        }
-      }
-    }
-  }
-};
-cljs.reader.read_string = function(a) {
-  a = cljs.reader.push_back_reader.call(null, a);
-  return cljs.reader.read.call(null, a, !0, null, !1)
-};
-cljs.reader.read_date = function(a) {
-  return new Date(Date.parse.call(null, a))
-};
-cljs.reader.read_queue = function(a) {
-  return cljs.core.vector_QMARK_.call(null, a) ? cljs.core.into.call(null, cljs.core.PersistentQueue.EMPTY, a) : cljs.reader.reader_error.call(null, null, "Queue literal expects a vector for its elements.")
-};
-cljs.reader._STAR_tag_table_STAR_ = cljs.core.atom.call(null, cljs.core.ObjMap.fromObject(["inst", "uuid", "queue"], {inst:cljs.core.identity, uuid:cljs.core.identity, queue:cljs.reader.read_queue}));
-cljs.reader.maybe_read_tagged_type = function(a, b) {
-  var c = cljs.reader.read_symbol.call(null, a, b), d = cljs.reader.read.call(null, a, !0, null, !1), e = cljs.core.get.call(null, cljs.core.deref.call(null, cljs.reader._STAR_tag_table_STAR_), cljs.core.name.call(null, c));
-  return cljs.core.truth_(e) ? e.call(null, d) : cljs.reader.reader_error.call(null, a, "Could not find tag parser for ", cljs.core.name.call(null, c), cljs.core.pr_str.call(null, cljs.core.deref.call(null, cljs.reader._STAR_tag_table_STAR_)))
-};
-cljs.reader.register_tag_parser_BANG_ = function(a, b) {
-  var c = cljs.core.name.call(null, a), d = cljs.core.get.call(null, cljs.core.deref.call(null, cljs.reader._STAR_tag_table_STAR_), c);
-  cljs.core.swap_BANG_.call(null, cljs.reader._STAR_tag_table_STAR_, cljs.core.assoc, c, b);
-  return d
+jayq.util.clj__GT_js = function clj__GT_js(b) {
+  return cljs.core.string_QMARK_.call(null, b) ? b : cljs.core.keyword_QMARK_.call(null, b) ? cljs.core.name.call(null, b) : cljs.core.map_QMARK_.call(null, b) ? cljs.core.reduce.call(null, function(b, d) {
+    var e = cljs.core.nth.call(null, d, 0, null), f = cljs.core.nth.call(null, d, 1, null);
+    return cljs.core.assoc.call(null, b, clj__GT_js.call(null, e), clj__GT_js.call(null, f))
+  }, cljs.core.ObjMap.fromObject([], {}), b).strobj : cljs.core.coll_QMARK_.call(null, b) ? cljs.core.apply.call(null, cljs.core.array, cljs.core.map.call(null, clj__GT_js, b)) : b
 };
 var clojure = {string:{}};
 clojure.string.seq_reverse = function(a) {
@@ -12594,51 +12295,6 @@ clojure.string.escape = function(a, b) {
     cljs.core.truth_(g) ? c.append("" + cljs.core.str(g)) : c.append(f);
     e += 1
   }
-};
-var jayq = {util:{}};
-jayq.util.map__GT_js = function(a) {
-  var b = {}, a = cljs.core.seq.call(null, a);
-  if(cljs.core.truth_(a)) {
-    var c = cljs.core.first.call(null, a);
-    cljs.core.nth.call(null, c, 0, null);
-    for(cljs.core.nth.call(null, c, 1, null);;) {
-      var d = c, c = cljs.core.nth.call(null, d, 0, null), d = cljs.core.nth.call(null, d, 1, null);
-      b[cljs.core.name.call(null, c)] = d;
-      a = cljs.core.next.call(null, a);
-      if(cljs.core.truth_(a)) {
-        c = a, a = cljs.core.first.call(null, c), d = c, c = a, a = d
-      }else {
-        break
-      }
-    }
-  }
-  return b
-};
-jayq.util.wait = function(a, b) {
-  return setTimeout(b, a)
-};
-jayq.util.log = function() {
-  var a = function(a, b) {
-    var e = cljs.core.string_QMARK_.call(null, a) ? cljs.core.apply.call(null, cljs.core.str, a, b) : a;
-    return console.log(e)
-  }, b = function(b, d) {
-    var e = null;
-    goog.isDef(d) && (e = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1), 0));
-    return a.call(this, b, e)
-  };
-  b.cljs$lang$maxFixedArity = 1;
-  b.cljs$lang$applyTo = function(b) {
-    var d = cljs.core.first(b), b = cljs.core.rest(b);
-    return a(d, b)
-  };
-  b.cljs$lang$arity$variadic = a;
-  return b
-}();
-jayq.util.clj__GT_js = function clj__GT_js(b) {
-  return cljs.core.string_QMARK_.call(null, b) ? b : cljs.core.keyword_QMARK_.call(null, b) ? cljs.core.name.call(null, b) : cljs.core.map_QMARK_.call(null, b) ? cljs.core.reduce.call(null, function(b, d) {
-    var e = cljs.core.nth.call(null, d, 0, null), f = cljs.core.nth.call(null, d, 1, null);
-    return cljs.core.assoc.call(null, b, clj__GT_js.call(null, e), clj__GT_js.call(null, f))
-  }, cljs.core.ObjMap.fromObject([], {}), b).strobj : cljs.core.coll_QMARK_.call(null, b) ? cljs.core.apply.call(null, cljs.core.array, cljs.core.map.call(null, clj__GT_js, b)) : b
 };
 jayq.core = {};
 jayq.core.crate_meta = function(a) {
@@ -13097,6 +12753,350 @@ jayq.core.off = function() {
 jayq.core.prevent = function(a) {
   return a.preventDefault()
 };
+cljs.reader = {};
+void 0;
+cljs.reader.PushbackReader = {};
+cljs.reader.read_char = function(a) {
+  if(a ? a.cljs$reader$PushbackReader$read_char$arity$1 : a) {
+    a = a.cljs$reader$PushbackReader$read_char$arity$1(a)
+  }else {
+    var b;
+    b = cljs.reader.read_char[goog.typeOf.call(null, a)];
+    if(!b && (b = cljs.reader.read_char._, !b)) {
+      throw cljs.core.missing_protocol.call(null, "PushbackReader.read-char", a);
+    }
+    a = b.call(null, a)
+  }
+  return a
+};
+cljs.reader.unread = function(a, b) {
+  var c;
+  if(a ? a.cljs$reader$PushbackReader$unread$arity$2 : a) {
+    c = a.cljs$reader$PushbackReader$unread$arity$2(a, b)
+  }else {
+    c = cljs.reader.unread[goog.typeOf.call(null, a)];
+    if(!c && (c = cljs.reader.unread._, !c)) {
+      throw cljs.core.missing_protocol.call(null, "PushbackReader.unread", a);
+    }
+    c = c.call(null, a, b)
+  }
+  return c
+};
+void 0;
+cljs.reader.StringPushbackReader = function(a, b, c) {
+  this.s = a;
+  this.index_atom = b;
+  this.buffer_atom = c
+};
+cljs.reader.StringPushbackReader.cljs$lang$type = !0;
+cljs.reader.StringPushbackReader.cljs$lang$ctorPrSeq = function() {
+  return cljs.core.list.call(null, "cljs.reader.StringPushbackReader")
+};
+cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$ = !0;
+cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$read_char$arity$1 = function() {
+  if(cljs.core.empty_QMARK_.call(null, cljs.core.deref.call(null, this.buffer_atom))) {
+    var a = cljs.core.deref.call(null, this.index_atom);
+    cljs.core.swap_BANG_.call(null, this.index_atom, cljs.core.inc);
+    return this.s[a]
+  }
+  a = cljs.core.deref.call(null, this.buffer_atom);
+  cljs.core.swap_BANG_.call(null, this.buffer_atom, cljs.core.rest);
+  return cljs.core.first.call(null, a)
+};
+cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$unread$arity$2 = function(a, b) {
+  return cljs.core.swap_BANG_.call(null, this.buffer_atom, function(a) {
+    return cljs.core.cons.call(null, b, a)
+  })
+};
+cljs.reader.StringPushbackReader;
+cljs.reader.push_back_reader = function(a) {
+  return new cljs.reader.StringPushbackReader(a, cljs.core.atom.call(null, 0), cljs.core.atom.call(null, null))
+};
+cljs.reader.whitespace_QMARK_ = function(a) {
+  var b = goog.string.isBreakingWhitespace.call(null, a);
+  return cljs.core.truth_(b) ? b : "," === a
+};
+cljs.reader.numeric_QMARK_ = function(a) {
+  return goog.string.isNumeric.call(null, a)
+};
+cljs.reader.comment_prefix_QMARK_ = function(a) {
+  return";" === a
+};
+cljs.reader.number_literal_QMARK_ = function(a, b) {
+  var c = cljs.reader.numeric_QMARK_.call(null, b);
+  if(c) {
+    return c
+  }
+  c = function() {
+    var a = "+" === b;
+    return a ? a : "-" === b
+  }();
+  return cljs.core.truth_(c) ? cljs.reader.numeric_QMARK_.call(null, function() {
+    var b = cljs.reader.read_char.call(null, a);
+    cljs.reader.unread.call(null, a, b);
+    return b
+  }()) : c
+};
+void 0;
+void 0;
+void 0;
+cljs.reader.reader_error = function() {
+  var a = function(a, b) {
+    throw cljs.core.apply.call(null, cljs.core.str, b);
+  }, b = function(b, d) {
+    var e = null;
+    goog.isDef(d) && (e = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1), 0));
+    return a.call(this, b, e)
+  };
+  b.cljs$lang$maxFixedArity = 1;
+  b.cljs$lang$applyTo = function(b) {
+    var d = cljs.core.first(b), b = cljs.core.rest(b);
+    return a(d, b)
+  };
+  b.cljs$lang$arity$variadic = a;
+  return b
+}();
+cljs.reader.macro_terminating_QMARK_ = function(a) {
+  var b = "#" != a;
+  return b && (b = "'" != a) ? (b = ":" != a) ? cljs.reader.macros.call(null, a) : b : b
+};
+cljs.reader.read_token = function(a, b) {
+  for(var c = new goog.string.StringBuffer(b), d = cljs.reader.read_char.call(null, a);;) {
+    var e;
+    e = null == d;
+    e || (e = (e = cljs.reader.whitespace_QMARK_.call(null, d)) ? e : cljs.reader.macro_terminating_QMARK_.call(null, d));
+    if(e) {
+      return cljs.reader.unread.call(null, a, d), c.toString()
+    }
+    c.append(d);
+    d = cljs.reader.read_char.call(null, a)
+  }
+};
+cljs.reader.skip_line = function(a) {
+  for(;;) {
+    var b = cljs.reader.read_char.call(null, a);
+    var c = "n" === b;
+    b = c ? c : (c = "r" === b) ? c : null == b;
+    if(b) {
+      return a
+    }
+  }
+};
+cljs.reader.int_pattern = cljs.core.re_pattern.call(null, "([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?");
+cljs.reader.ratio_pattern = cljs.core.re_pattern.call(null, "([-+]?[0-9]+)/([0-9]+)");
+cljs.reader.float_pattern = cljs.core.re_pattern.call(null, "([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?");
+cljs.reader.symbol_pattern = cljs.core.re_pattern.call(null, "[:]?([^0-9/].*/)?([^0-9/][^/]*)");
+cljs.reader.re_find_STAR_ = function(a, b) {
+  var c = a.exec(b);
+  return null != c ? 1 === c.length ? c[0] : c : null
+};
+cljs.reader.match_int = function(a) {
+  var a = cljs.reader.re_find_STAR_.call(null, cljs.reader.int_pattern, a), b = a[2];
+  var c = null == b, b = c ? c : 1 > b.length;
+  if(!b) {
+    return 0
+  }
+  b = "-" === a[1] ? -1 : 1;
+  c = cljs.core.truth_(a[3]) ? [a[3], 10] : cljs.core.truth_(a[4]) ? [a[4], 16] : cljs.core.truth_(a[5]) ? [a[5], 8] : cljs.core.truth_(a[7]) ? [a[7], parseInt(a[7])] : [null, null];
+  a = c[0];
+  c = c[1];
+  return null == a ? null : b * parseInt(a, c)
+};
+cljs.reader.match_ratio = function(a) {
+  var a = cljs.reader.re_find_STAR_.call(null, cljs.reader.ratio_pattern, a), b = a[2];
+  return parseInt(a[1]) / parseInt(b)
+};
+cljs.reader.match_float = function(a) {
+  return parseFloat(a)
+};
+cljs.reader.re_matches_STAR_ = function(a, b) {
+  var c = a.exec(b), d;
+  d = (d = null != c) ? c[0] === b : d;
+  return d ? 1 === c.length ? c[0] : c : null
+};
+cljs.reader.match_number = function(a) {
+  return cljs.core.truth_(cljs.reader.re_matches_STAR_.call(null, cljs.reader.int_pattern, a)) ? cljs.reader.match_int.call(null, a) : cljs.core.truth_(cljs.reader.re_matches_STAR_.call(null, cljs.reader.ratio_pattern, a)) ? cljs.reader.match_ratio.call(null, a) : cljs.core.truth_(cljs.reader.re_matches_STAR_.call(null, cljs.reader.float_pattern, a)) ? cljs.reader.match_float.call(null, a) : null
+};
+cljs.reader.escape_char_map = function(a) {
+  return"f" === a ? "\u000c" : "b" === a ? "\u0008" : '"' === a ? '"' : "\\" === a ? "\\" : "n" === a ? "\n" : "r" === a ? "\r" : "t" === a ? "\t" : null
+};
+cljs.reader.read_unicode_char = function(a) {
+  return cljs.reader.reader_error.call(null, a, "Unicode characters not supported by reader (yet)")
+};
+cljs.reader.escape_char = function(a, b) {
+  var c = cljs.reader.read_char.call(null, b), d = cljs.reader.escape_char_map.call(null, c);
+  if(cljs.core.truth_(d)) {
+    return d
+  }
+  d = (d = "u" === c) ? d : cljs.reader.numeric_QMARK_.call(null, c);
+  return d ? cljs.reader.read_unicode_char.call(null, b, c) : cljs.reader.reader_error.call(null, b, "Unsupported escape character: \\", c)
+};
+cljs.reader.read_past = function(a, b) {
+  for(var c = cljs.reader.read_char.call(null, b);;) {
+    if(cljs.core.truth_(a.call(null, c))) {
+      c = cljs.reader.read_char.call(null, b)
+    }else {
+      return c
+    }
+  }
+};
+cljs.reader.read_delimited_list = function(a, b, c) {
+  for(var d = cljs.core.transient$.call(null, cljs.core.PersistentVector.fromArray([]));;) {
+    var e = cljs.reader.read_past.call(null, cljs.reader.whitespace_QMARK_, b);
+    cljs.core.truth_(e) || cljs.reader.reader_error.call(null, b, "EOF");
+    if(a === e) {
+      return cljs.core.persistent_BANG_.call(null, d)
+    }
+    var f = cljs.reader.macros.call(null, e);
+    cljs.core.truth_(f) ? e = f.call(null, b, e) : (cljs.reader.unread.call(null, b, e), e = cljs.reader.read.call(null, b, !0, null, c));
+    d = e === b ? d : cljs.core.conj_BANG_.call(null, d, e)
+  }
+};
+cljs.reader.not_implemented = function(a, b) {
+  return cljs.reader.reader_error.call(null, a, "Reader for ", b, " not implemented yet")
+};
+void 0;
+cljs.reader.read_dispatch = function(a, b) {
+  var c = cljs.reader.read_char.call(null, a), d = cljs.reader.dispatch_macros.call(null, c);
+  if(cljs.core.truth_(d)) {
+    return d.call(null, a, b)
+  }
+  d = cljs.reader.maybe_read_tagged_type.call(null, a, c);
+  return cljs.core.truth_(d) ? d : cljs.reader.reader_error.call(null, a, "No dispatch macro for ", c)
+};
+cljs.reader.read_unmatched_delimiter = function(a, b) {
+  return cljs.reader.reader_error.call(null, a, "Unmached delimiter ", b)
+};
+cljs.reader.read_list = function(a) {
+  return cljs.core.apply.call(null, cljs.core.list, cljs.reader.read_delimited_list.call(null, ")", a, !0))
+};
+cljs.reader.read_comment = cljs.reader.skip_line;
+cljs.reader.read_vector = function(a) {
+  return cljs.reader.read_delimited_list.call(null, "]", a, !0)
+};
+cljs.reader.read_map = function(a) {
+  var b = cljs.reader.read_delimited_list.call(null, "}", a, !0);
+  cljs.core.odd_QMARK_.call(null, cljs.core.count.call(null, b)) && cljs.reader.reader_error.call(null, a, "Map literal must contain an even number of forms");
+  return cljs.core.apply.call(null, cljs.core.hash_map, b)
+};
+cljs.reader.read_number = function(a, b) {
+  for(var c = new goog.string.StringBuffer(b), d = cljs.reader.read_char.call(null, a);;) {
+    if(cljs.core.truth_(function() {
+      var a = null == d;
+      return a ? a : (a = cljs.reader.whitespace_QMARK_.call(null, d)) ? a : cljs.reader.macros.call(null, d)
+    }())) {
+      cljs.reader.unread.call(null, a, d);
+      var e = c.toString(), c = cljs.reader.match_number.call(null, e);
+      return cljs.core.truth_(c) ? c : cljs.reader.reader_error.call(null, a, "Invalid number format [", e, "]")
+    }
+    c.append(d);
+    d = e = cljs.reader.read_char.call(null, a)
+  }
+};
+cljs.reader.read_string_STAR_ = function(a) {
+  for(var b = new goog.string.StringBuffer, c = cljs.reader.read_char.call(null, a);;) {
+    if(null == c) {
+      return cljs.reader.reader_error.call(null, a, "EOF while reading string")
+    }
+    if("\\" === c) {
+      b.append(cljs.reader.escape_char.call(null, b, a))
+    }else {
+      if('"' === c) {
+        return b.toString()
+      }
+      b.append(c)
+    }
+    c = cljs.reader.read_char.call(null, a)
+  }
+};
+cljs.reader.special_symbols = cljs.core.ObjMap.fromObject(["nil", "true", "false"], {nil:null, "true":!0, "false":!1});
+cljs.reader.read_symbol = function(a, b) {
+  var c = cljs.reader.read_token.call(null, a, b);
+  return cljs.core.truth_(goog.string.contains.call(null, c, "/")) ? cljs.core.symbol.call(null, cljs.core.subs.call(null, c, 0, c.indexOf("/")), cljs.core.subs.call(null, c, c.indexOf("/") + 1, c.length)) : cljs.core.get.call(null, cljs.reader.special_symbols, c, cljs.core.symbol.call(null, c))
+};
+cljs.reader.read_keyword = function(a) {
+  var b = cljs.reader.read_token.call(null, a, cljs.reader.read_char.call(null, a)), b = cljs.reader.re_matches_STAR_.call(null, cljs.reader.symbol_pattern, b), c = b[0], d = b[1], e = b[2];
+  return cljs.core.truth_(function() {
+    var a;
+    a = (a = void 0 !== d) ? ":/" === d.substring(d.length - 2, d.length) : a;
+    return cljs.core.truth_(a) ? a : (a = ":" === e[e.length - 1]) ? a : -1 !== c.indexOf("::", 1)
+  }()) ? cljs.reader.reader_error.call(null, a, "Invalid token: ", c) : cljs.core.truth_(d) ? cljs.core.keyword.call(null, d.substring(0, d.indexOf("/")), e) : cljs.core.keyword.call(null, c)
+};
+cljs.reader.desugar_meta = function(a) {
+  return cljs.core.symbol_QMARK_.call(null, a) ? cljs.core.ObjMap.fromObject(["\ufdd0'tag"], {"\ufdd0'tag":a}) : cljs.core.string_QMARK_.call(null, a) ? cljs.core.ObjMap.fromObject(["\ufdd0'tag"], {"\ufdd0'tag":a}) : cljs.core.keyword_QMARK_.call(null, a) ? cljs.core.PersistentArrayMap.fromArrays([a], [!0]) : a
+};
+cljs.reader.wrapping_reader = function(a) {
+  return function(b) {
+    return cljs.core.list.call(null, a, cljs.reader.read.call(null, b, !0, null, !0))
+  }
+};
+cljs.reader.throwing_reader = function(a) {
+  return function(b) {
+    return cljs.reader.reader_error.call(null, b, a)
+  }
+};
+cljs.reader.read_meta = function(a) {
+  var b = cljs.reader.desugar_meta.call(null, cljs.reader.read.call(null, a, !0, null, !0));
+  cljs.core.map_QMARK_.call(null, b) || cljs.reader.reader_error.call(null, a, "Metadata must be Symbol,Keyword,String or Map");
+  var c = cljs.reader.read.call(null, a, !0, null, !0), d;
+  null != c ? (d = (d = c.cljs$lang$protocol_mask$partition0$ & 131072) ? d : c.cljs$core$IWithMeta$, d = d ? !0 : c.cljs$lang$protocol_mask$partition0$ ? !1 : cljs.core.type_satisfies_.call(null, cljs.core.IWithMeta, c)) : d = cljs.core.type_satisfies_.call(null, cljs.core.IWithMeta, c);
+  return d ? cljs.core.with_meta.call(null, c, cljs.core.merge.call(null, cljs.core.meta.call(null, c), b)) : cljs.reader.reader_error.call(null, a, "Metadata can only be applied to IWithMetas")
+};
+cljs.reader.read_set = function(a) {
+  return cljs.core.set.call(null, cljs.reader.read_delimited_list.call(null, "}", a, !0))
+};
+cljs.reader.read_regex = function(a, b) {
+  return cljs.core.re_pattern.call(null, cljs.reader.read_string_STAR_.call(null, a, b))
+};
+cljs.reader.read_discard = function(a) {
+  cljs.reader.read.call(null, a, !0, null, !0);
+  return a
+};
+cljs.reader.macros = function(a) {
+  return"@" === a ? cljs.reader.wrapping_reader.call(null, "\ufdd1'deref") : "`" === a ? cljs.reader.not_implemented : '"' === a ? cljs.reader.read_string_STAR_ : "#" === a ? cljs.reader.read_dispatch : "%" === a ? cljs.reader.not_implemented : "'" === a ? cljs.reader.wrapping_reader.call(null, "\ufdd1'quote") : "(" === a ? cljs.reader.read_list : ")" === a ? cljs.reader.read_unmatched_delimiter : ":" === a ? cljs.reader.read_keyword : ";" === a ? cljs.reader.not_implemented : "[" === a ? cljs.reader.read_vector : 
+  "{" === a ? cljs.reader.read_map : "\\" === a ? cljs.reader.read_char : "]" === a ? cljs.reader.read_unmatched_delimiter : "}" === a ? cljs.reader.read_unmatched_delimiter : "^" === a ? cljs.reader.read_meta : "~" === a ? cljs.reader.not_implemented : null
+};
+cljs.reader.dispatch_macros = function(a) {
+  return"_" === a ? cljs.reader.read_discard : "!" === a ? cljs.reader.read_comment : '"' === a ? cljs.reader.read_regex : "<" === a ? cljs.reader.throwing_reader.call(null, "Unreadable form") : "{" === a ? cljs.reader.read_set : null
+};
+cljs.reader.read = function(a, b, c) {
+  for(;;) {
+    var d = cljs.reader.read_char.call(null, a);
+    if(null == d) {
+      return cljs.core.truth_(b) ? cljs.reader.reader_error.call(null, a, "EOF") : c
+    }
+    if(!cljs.reader.whitespace_QMARK_.call(null, d)) {
+      if(cljs.reader.comment_prefix_QMARK_.call(null, d)) {
+        a = cljs.reader.read_comment.call(null, a, d)
+      }else {
+        var e = cljs.reader.macros.call(null, d), d = cljs.core.truth_(e) ? e.call(null, a, d) : cljs.reader.number_literal_QMARK_.call(null, a, d) ? cljs.reader.read_number.call(null, a, d) : cljs.reader.read_symbol.call(null, a, d);
+        if(d !== a) {
+          return d
+        }
+      }
+    }
+  }
+};
+cljs.reader.read_string = function(a) {
+  a = cljs.reader.push_back_reader.call(null, a);
+  return cljs.reader.read.call(null, a, !0, null, !1)
+};
+cljs.reader.read_date = function(a) {
+  return new Date(Date.parse.call(null, a))
+};
+cljs.reader.read_queue = function(a) {
+  return cljs.core.vector_QMARK_.call(null, a) ? cljs.core.into.call(null, cljs.core.PersistentQueue.EMPTY, a) : cljs.reader.reader_error.call(null, null, "Queue literal expects a vector for its elements.")
+};
+cljs.reader._STAR_tag_table_STAR_ = cljs.core.atom.call(null, cljs.core.ObjMap.fromObject(["inst", "uuid", "queue"], {inst:cljs.core.identity, uuid:cljs.core.identity, queue:cljs.reader.read_queue}));
+cljs.reader.maybe_read_tagged_type = function(a, b) {
+  var c = cljs.reader.read_symbol.call(null, a, b), d = cljs.reader.read.call(null, a, !0, null, !1), e = cljs.core.get.call(null, cljs.core.deref.call(null, cljs.reader._STAR_tag_table_STAR_), cljs.core.name.call(null, c));
+  return cljs.core.truth_(e) ? e.call(null, d) : cljs.reader.reader_error.call(null, a, "Could not find tag parser for ", cljs.core.name.call(null, c), cljs.core.pr_str.call(null, cljs.core.deref.call(null, cljs.reader._STAR_tag_table_STAR_)))
+};
+cljs.reader.register_tag_parser_BANG_ = function(a, b) {
+  var c = cljs.core.name.call(null, a), d = cljs.core.get.call(null, cljs.core.deref.call(null, cljs.reader._STAR_tag_table_STAR_), c);
+  cljs.core.swap_BANG_.call(null, cljs.reader._STAR_tag_table_STAR_, cljs.core.assoc, c, b);
+  return d
+};
 var cljsbinding = {};
 cljsbinding.BindMonitor = cljs.core.atom.call(null, !1);
 cljsbinding.BindDependencies = cljs.core.atom.call(null, cljs.core.ObjMap.fromObject([], {}));
@@ -13443,6 +13443,10 @@ main.checkall = cljs.core.atom.call(null, !1);
 goog.exportSymbol("main.checkall", main.checkall);
 main.todos = cljs.core.atom.call(null, cljs.core.PersistentVector.fromArray([]));
 goog.exportSymbol("main.todos", main.todos);
+main.login = function() {
+  return main.alert.call(null, "food".call(null))
+};
+goog.exportSymbol("main.login", main.login);
 main.todocount = function() {
   return cljs.core.count.call(null, cljs.core.deref.call(null, main.todos))
 };

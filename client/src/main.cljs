@@ -8,6 +8,10 @@
 (def ^:export checkall (atom false))
 (def ^:export todos (atom []))
 
+(defn ^:export login [] 
+  (alert("food"))
+)
+
 (defn ^:export todocount [] 
   (count @todos)
 )
